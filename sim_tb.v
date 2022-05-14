@@ -6,7 +6,7 @@ module sim_tb();
 parameter DLY      = 1    ;
 parameter CLK_HP_A = 62.5  ;
 
-reg rst_n ;
+reg rst   ;
 reg clka  ;
 reg en    ;
 reg [3:0] data_in   ;
@@ -17,22 +17,22 @@ wire      H1 ;
 wire      H2 ;
 
 crc5_parallel crc5_parallel(
-  .rst_n    (rst_n    ),
-  .clk      (clka     ),  
+  .rst      (rst       ),
+  .clk      (clka      ),  
   .data_in  (data_in   ),
   .crc5_init(crc5_init ),
-  .crc5     (),  
-)
+  .crc5     (          )  
+);
 
 always # CLK_HP_A clka = ~clka ;
 
-task HMatrix(input [3:0] data,input [4:0] init)
+task HMatrix(input [3:0] data,input [4:0] init) ;
 begin
 crc5_init = init ;
 @(posedge clka)
-     rst_n = 0 ;
-#40  rst_n = 1 ;
-#40  rst_n = 0 ;
+     rst = 0 ;
+#40  rst = 1 ;
+#40  rst = 0 ;
      data_in = data ;
 end
 endtask
@@ -48,26 +48,26 @@ end
 
 initial begin
   clka  = 0 ;
-  rst_n = 0 ;
+  rst   = 0 ;
   cnt   = 0 ;
   cnt_en = 0 ;
   #1000
   cnt_en = 1 ;
   
   //H1
-  HMatrix(4'h01,5'h00);
-  HMatrix(4'h02,5'h00);
-  HMatrix(4'h04,5'h00);
-  HMatrix(4'h08,5'h00);
+  HMatrix(4'h1,5'h00);
+  HMatrix(4'h2,5'h00);
+  HMatrix(4'h4,5'h00);
+  HMatrix(4'h8,5'h00);
   
   #500
   
   //H2
-  HMatrix(4'h00,5'h01);
-  HMatrix(4'h00,5'h02);
-  HMatrix(4'h00,5'h04);
-  HMatrix(4'h00,5'h08);
-  HMatrix(4'h00,5'h10);
+  HMatrix(4'h0,5'h01);
+  HMatrix(4'h0,5'h02);
+  HMatrix(4'h0,5'h04);
+  HMatrix(4'h0,5'h08);
+  HMatrix(4'h0,5'h10);
   
   #20000;
   $finish ;
